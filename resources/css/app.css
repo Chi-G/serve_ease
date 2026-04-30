@@ -1,0 +1,118 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-size: 16px;
+  --background: #1A1A1A;
+  --foreground: #ffffff;
+  --card: #252525;
+  --card-foreground: #ffffff;
+  --popover: #2A2A2A;
+  --popover-foreground: #ffffff;
+  --primary: #FF5C00;
+  --primary-foreground: #ffffff;
+  --secondary: #2A2A2A;
+  --secondary-foreground: #ffffff;
+  --muted: #333333;
+  --muted-foreground: #A0A0A0;
+  --accent: #FF5C00;
+  --accent-foreground: #ffffff;
+  --destructive: #EF4444;
+  --destructive-foreground: #ffffff;
+  --border: rgba(255, 255, 255, 0.1);
+  --input: rgba(255, 255, 255, 0.05);
+  --input-background: #2A2A2A;
+  --switch-background: #3A3A3A;
+  --font-weight-medium: 500;
+  --font-weight-normal: 400;
+  --ring: #FF5C00;
+  --chart-1: #FF5C00;
+  --chart-2: #FFA500;
+  --chart-3: #FFD700;
+  --chart-4: #FF8C00;
+  --chart-5: #FF6347;
+  --radius: 1rem;
+  --sidebar: #1A1A1A;
+  --sidebar-foreground: #ffffff;
+  --sidebar-primary: #FF5C00;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #2A2A2A;
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: rgba(255, 255, 255, 0.1);
+  --sidebar-ring: #FF5C00;
+}
+
+.dark {
+  --background: #1A1A1A;
+  --foreground: #ffffff;
+  --card: #252525;
+  --card-foreground: #ffffff;
+  --popover: #2A2A2A;
+  --popover-foreground: #ffffff;
+  --primary: #FF5C00;
+  --primary-foreground: #ffffff;
+  --secondary: #2A2A2A;
+  --secondary-foreground: #ffffff;
+  --muted: #333333;
+  --muted-foreground: #A0A0A0;
+  --accent: #FF5C00;
+  --accent-foreground: #ffffff;
+  --destructive: #EF4444;
+  --destructive-foreground: #ffffff;
+  --border: rgba(255, 255, 255, 0.1);
+  --input: rgba(255, 255, 255, 0.05);
+  --ring: #FF5C00;
+  --chart-1: #FF5C00;
+  --chart-2: #FFA500;
+  --chart-3: #FFD700;
+  --chart-4: #FF8C00;
+  --chart-5: #FF6347;
+  --sidebar: #1A1A1A;
+  --sidebar-foreground: #ffffff;
+  --sidebar-primary: #FF5C00;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #2A2A2A;
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: rgba(255, 255, 255, 0.1);
+  --sidebar-ring: #FF5C00;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  html {
+    font-size: var(--font-size);
+  }
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.scrollbar-hide {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+}
+
+/* Custom Animations */
+@keyframes spin-slow {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.animate-spin-slow {
+    animation: spin-slow 8s linear infinite;
+}
