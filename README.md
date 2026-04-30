@@ -1,4 +1,7 @@
-# <div align="center"> <img src="https://raw.githubusercontent.com/lucide-react/lucide/main/icons/utensils-crossed.svg" width="80" height="80" /> <br/> ServeEase </div>
+<div align="center">
+  <img src="https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/utensils-crossed.svg" width="80" height="80" />
+  <h1>ServeEase</h1>
+</div>
 
 <div align="center">
   <strong>The Elite POS & Restaurant Management Ecosystem</strong>
@@ -15,40 +18,40 @@
 
 ---
 
-## 🌟 Vision
+## Vision
 
 **ServeEase** is not just a POS; it’s a high-performance administrative ecosystem designed for modern hospitality. Built with a focus on "Elite Aesthetics" and seamless user experience, ServeEase bridges the gap between complex backend management and fluid front-of-house operations.
 
-## 🏗️ Core Pillars
+## Core Pillars
 
 ServeEase is built on four specialized modules, each tailored to a specific stakeholder in the restaurant ecosystem:
 
-### 1. 🛡️ Super Admin (The Executive)
+### 1. Super Admin (The Executive)
 *Full high-level control and business intelligence.*
 - **Financial Intelligence:** Real-time revenue dashboards and historical sales analytics.
 - **Menu Engineering:** Dynamic management of the master product list, global pricing, and category hierarchies.
 - **Table Orchestration:** Adding physical layout configurations and generating unique, secure QR packets.
 - **Staffing Hierarchy:** Centralized account management for Managers, Waiters, and Kitchen staff.
 
-### 2. 📋 Waiter Dashboard (The Operator)
+### 2. Waiter Dashboard (The Operator)
 *Precision tools for live floor management.*
 - **Live Floor Operations:** Real-time table alerts and service request monitoring.
 - **Service Display System:** Visual tracking of order statuses and table availability.
 - **Active Alerts:** Instant notifications for ready orders or customer assistance.
 
-### 3. 📦 Manager Hub (The Controller)
+### 3. Manager Hub (The Controller)
 *Day-to-day operational excellence.*
 - **Inventory Matrix:** Real-time stock tracking with low-stock predictive alerts.
 - **Sales Reconciliation:** Daily sales reports and performance tracking.
 - **Shift Management:** Active staff monitoring and scheduling.
 
-### 4. 📱 Customer Experience (The Guest)
+### 4. Customer Experience (The Guest)
 *Frictionless ordering without the app fatigue.*
 - **Scan-to-Order:** Instant menu access via table-specific QR codes.
 - **Order Tracking:** Real-time visibility into the kitchen's progress.
 - **Elite Menu UI:** A vibrant, image-rich digital catalog designed to drive upsells.
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 - **Backend:** Laravel 11 (PHP 8.2+)
 - **Frontend:** React 18 with Inertia.js (The monolith feel with SPA speed)
@@ -57,7 +60,7 @@ ServeEase is built on four specialized modules, each tailored to a specific stak
 - **Real-time:** Laravel Reverb / Pusher (Websocket integration for live alerts)
 - **Database:** MySQL / PostgreSQL
 
-## 🚀 Installation & Setup
+## Installation & Setup
 
 ### Prerequisites
 - PHP 8.2+
@@ -94,7 +97,7 @@ php artisan serve
 npm run dev
 ```
 
-## 🎨 Design Philosophy
+## Design Philosophy
 
 ServeEase follows a **Premium Dark Aesthetic**:
 - **Glassmorphism:** Subtle background blurs and border highlights.
@@ -115,5 +118,5 @@ ServeEase follows a **Premium Dark Aesthetic**:
 ---
 
 <div align="center">
-  Built with ❤️ by the ServeEase Team.
+  Built with ❤️ by the Forahia Team.
 </div>
