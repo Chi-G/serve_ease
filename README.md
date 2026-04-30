@@ -105,7 +105,7 @@ ServeEase follows a **Premium Dark Aesthetic**:
 - **Typography:** High-contrast, bold italic headers for an "Elite" feel.
 - **Responsiveness:** Mobile-first architecture for Waiters and Customers.
 
-## 🗺️ Roadmap
+## Roadmap
 
 - [x] Super Admin Dashboard Refactor
 - [x] Menu Pagination (6 items/page)
