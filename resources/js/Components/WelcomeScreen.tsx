@@ -5,6 +5,7 @@ interface WelcomeScreenProps {
   tableNumber: number;
   onSubmit: (names: string[]) => void;
   onNavigateToKDS: () => void;
+  initialNames?: string[];
 }
 
 const AVATAR_COLORS = [
@@ -12,8 +13,8 @@ const AVATAR_COLORS = [
   '#FF4500', '#FF7F50', '#FFA07A'
 ];
 
-export function WelcomeScreen({ tableNumber, onSubmit, onNavigateToKDS }: WelcomeScreenProps) {
-  const [names, setNames] = useState<string[]>([]);
+export function WelcomeScreen({ tableNumber, onSubmit, onNavigateToKDS, initialNames = [] }: WelcomeScreenProps) {
+  const [names, setNames] = useState<string[]>(initialNames);
   const [currentInput, setCurrentInput] = useState('');
 
   const addName = () => {
@@ -42,7 +43,7 @@ export function WelcomeScreen({ tableNumber, onSubmit, onNavigateToKDS }: Welcom
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden" style={{
-      backgroundImage: 'linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url("https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=1600&q=80")',
+      backgroundImage: 'url(/images/slider1.jpeg)',      
       backgroundSize: 'cover',
       backgroundPosition: 'center',
       backgroundColor: '#0A0A0A'

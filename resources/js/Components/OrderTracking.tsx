@@ -17,9 +17,9 @@ export function OrderTracking({ order, onPlaceNewOrder, onAddMoreItems, onCallWa
   const [currentStatus, setCurrentStatus] = useState<Order['status']>(order.status);
   const [timeRemaining, setTimeRemaining] = useState(() => {
     if (order.status === 'ready' || order.status === 'served') return 0;
-    
-    // Calculate elapsed time since order creation
-    const startTime = new Date(order.created_at).getTime();
+    if (order.status === 'pending') return null;
+    // Calculate elapsed time since order was verified (updated_at)
+    const startTime = new Date(order.updated_at).getTime();
     const now = new Date().getTime();
     const elapsedSeconds = Math.floor((now - startTime) / 1000);
     const totalWaitSeconds = 10 * 60; // 10 minutes
@@ -31,17 +31,25 @@ export function OrderTracking({ order, onPlaceNewOrder, onAddMoreItems, onCallWa
   const confirm = useConfirm();
 
   // Sync status if prop changes (e.g. from Echo real-time event)
-  useEffect(() => {
-    setCurrentStatus(order.status);
-    if (order.status === 'ready') {
-      setTimeRemaining(0);
-    }
-  }, [order.status]);
+    useEffect(() => {
+        if (order.status === 'ready' && currentStatus !== 'ready') {
+            setTimeRemaining(0);
+            setShowReadyFlash(true);
+            
+            // Play notification chime
+            const audio = new Audio('/sounds/notification.mp3');
+            audio.play().catch(e => console.log('Audio play blocked'));
+
+            setTimeout(() => setShowReadyFlash(false), 5000);
+        }
+        setCurrentStatus(order.status);
+    }, [order.status, currentStatus]);
 
   useEffect(() => {
-    if (currentStatus === 'in-kitchen' && timeRemaining > 0) {
+    if (['paid', 'in-kitchen'].includes(currentStatus) && timeRemaining !== null && timeRemaining > 0) {
       const interval = setInterval(() => {
         setTimeRemaining(prev => {
+          if (prev === null) return null;
           if (prev <= 1) {
             // Transition to ready once timer expires
             setCurrentStatus('ready');
@@ -55,8 +63,11 @@ export function OrderTracking({ order, onPlaceNewOrder, onAddMoreItems, onCallWa
       }, 1000);
 
       return () => clearInterval(interval);
+    } else if (['paid', 'in-kitchen'].includes(currentStatus) && timeRemaining === null) {
+        // Just transitioned to in-kitchen, start timer
+        setTimeRemaining(10 * 60);
     }
-  }, [currentStatus, timeRemaining, onUpdateStatus]);
+  }, [currentStatus, onUpdateStatus, timeRemaining]);
 
   const handleCancelOrderClick = async () => {
     const ok = await confirm({
@@ -104,7 +115,7 @@ export function OrderTracking({ order, onPlaceNewOrder, onAddMoreItems, onCallWa
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const progress = ((10 * 60 - timeRemaining) / (10 * 60)) * 100;
+  const progress = ((10 * 60 - (timeRemaining || 0)) / (10 * 60)) * 100;
 
   return (
     <div className="min-h-screen bg-background">
@@ -198,15 +209,22 @@ export function OrderTracking({ order, onPlaceNewOrder, onAddMoreItems, onCallWa
                 </div>
               </div>
 
-              {currentStatus === 'in-kitchen' && (
+              {['pending', 'paid', 'in-kitchen'].includes(currentStatus) && (
                 <div className="mb-8 animate-in fade-in duration-700">
                   <div className="flex items-center justify-center gap-2 mb-2 text-muted-foreground">
                     <Clock size={16} />
-                    <span className="text-xs font-bold uppercase tracking-widest">Estimated Wait</span>
+                    <span className="text-xs font-bold uppercase tracking-widest">
+                        {currentStatus === 'pending' ? 'Verification' : 'Estimated Wait'}
+                    </span>
                   </div>
                   <p className="text-4xl font-black tracking-tight" style={{ color: getStatusColor() }}>
-                    {formatTime(timeRemaining)}
+                    {timeRemaining === null ? '...' : formatTime(timeRemaining as number)}
                   </p>
+                  {currentStatus === 'pending' && (
+                    <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mt-2">
+                        Waiter is verifying payment
+                    </p>
+                  )}
                 </div>
               )}
 

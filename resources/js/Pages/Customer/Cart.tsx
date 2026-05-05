@@ -9,7 +9,8 @@ function CartContent() {
     currentCustomerIndex, 
     removeFromCart, 
     setCurrentCustomerIndex,
-    currentCustomerName
+    currentCustomerName,
+    resetGroupOrder
   } = useGroupOrder();
 
   const handleContinue = () => {
@@ -36,6 +37,7 @@ function CartContent() {
         removeFromCart={removeFromCart}
         onContinue={handleContinue}
         onBackToMenu={handleBackToMenu}
+        resetGroupOrder={resetGroupOrder}
         isLastCustomer={currentCustomerIndex === customerNames.length - 1}
       />
     </CustomerLayout>

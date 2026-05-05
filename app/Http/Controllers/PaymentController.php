@@ -23,7 +23,7 @@ class PaymentController extends Controller
         $response = Http::withToken(config('services.paystack.secret_key'))
             ->post('https://api.paystack.co/transaction/initialize', [
                 'email' => $validated['email'],
-                'amount' => $validated['total_price'] * 100,
+                'amount' => (int)round($validated['total_price'] * 100),
                 'callback_url' => route('payment.callback'),
                 'metadata' => [
                     'queue_number' => $validated['queue_number'],
@@ -39,13 +39,21 @@ class PaymentController extends Controller
                 'order_data' => $validated,
                 'expires_at' => now()->addHours(2), // Optional: auto-cleanup later
             ]);
-
+            
             return response()->json([
                 'authorization_url' => $data['authorization_url']
             ]);
         }
 
-        return response()->json(['error' => 'Payment initialization failed'], 400);
+        \Log::error('Paystack initialization failed', [
+            'response' => $response->json(),
+            'status' => $response->status(),
+        ]);
+
+        return response()->json([
+            'error' => 'Payment initialization failed',
+            'message' => $response->json()['message'] ?? 'Unknown error'
+        ], 400);
     }
 
     public function callback(Request $request)

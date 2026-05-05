@@ -18,6 +18,10 @@ class ServiceRequestController extends Controller
             'readyOrders' => \App\Models\Order::where('status', 'ready')
                 ->with(['items.product', 'table'])
                 ->latest()
+                ->get(),
+            'allOrders' => \App\Models\Order::whereNotIn('status', ['completed', 'cancelled'])
+                ->with(['items.product', 'table', 'customer'])
+                ->latest()
                 ->get()
         ]);
     }

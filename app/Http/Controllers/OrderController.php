@@ -61,9 +61,27 @@ class OrderController extends Controller
                 'table_id' => $table ? $table->id : null,
                 'total_price' => $data['total_price'],
                 'customer_email' => $data['email'] ?? null,
-                'status' => $data['method'] === 'card' ? 'in-kitchen' : 'pending',
+                'status' => ($data['method'] === 'card' || $data['method'] === 'online') ? 'in-kitchen' : 'pending',
                 'queue_number' => $data['queue_number'],
             ]);
+
+            // If it's an offline payment (Cash/POS), notify the waiter
+            if ($data['method'] === 'offline') {
+                $serviceRequest = \App\Models\ServiceRequest::create([
+                    'table_id' => $table ? $table->id : $data['table_id'],
+                    'customer_name' => $customer ? $customer->name : ($data['items'][0]['customer_name'] ?? 'Guest'),
+                    'request_type' => 'payment',
+                    'message' => "Payment collection (Cash/POS) for Order #{$data['queue_number']}",
+                    'status' => 'pending',
+                ]);
+
+                // Broadcast for real-time waiter notification
+                try {
+                    broadcast(new \App\Events\CallWaiterReceived($serviceRequest))->toOthers();
+                } catch (\Exception $e) {
+                    \Log::error('Failed to broadcast payment service request: ' . $e->getMessage());
+                }
+            }
 
             foreach ($data['items'] as $item) {
                 // Lock the product row to prevent race conditions during checkout
@@ -135,9 +153,25 @@ class OrderController extends Controller
                 event(new \App\Events\OrderStatusUpdated($order));
             }
 
-            return redirect()->route('menu.index')->with('success', 'Order cleared and cancelled.');
+            return redirect()->route('table.welcome', ['table' => $order->table->uuid, 'cancelled' => 'true'])->with('success', 'Order cleared and cancelled.');
         }
 
-        return redirect()->route('menu.index')->with('error', 'This order is already being prepared and cannot be cancelled, but we have cleared it from your screen.');
+        return redirect()->route('table.welcome', ['table' => $order->table->uuid, 'cancelled' => 'true'])->with('error', 'This order is already being prepared and cannot be cancelled, but we have cleared it from your screen.');
+    }
+
+    public function markAsPaid(Order $order)
+    {
+        $order->update(['status' => 'in-kitchen']);
+        
+        // Auto-resolve any pending payment requests for this table
+        \App\Models\ServiceRequest::where('table_id', $order->table_id)
+            ->where('type', 'payment')
+            ->where('status', 'pending')
+            ->update(['status' => 'resolved']);
+
+        // Broadcast for real-time customer and kitchen updates
+        event(new \App\Events\OrderStatusUpdated($order->load(['items.product', 'table'])));
+
+        return redirect()->back()->with('success', "Order #{$order->queue_number} marked as paid and sent to kitchen.");
     }
 }

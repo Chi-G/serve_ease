@@ -18,7 +18,9 @@ interface GroupOrderContextType {
   setCurrentOrder: (order: Order | null) => void;
   clearCart: () => void;
   logout: () => void;
+  resetGroupOrder: () => void;
   tableNumber: number;
+  tableUuid: string;
 }
 
 const GroupOrderContext = createContext<GroupOrderContextType | undefined>(undefined);
@@ -34,6 +36,10 @@ export function GroupOrderProvider({ children }: { children: React.ReactNode }) 
     const saved = localStorage.getItem('tableNumber');
     return saved ? parseInt(saved) : 1;
   });
+  const [tableUuid, setTableUuid] = useState<string>(() => {
+    const saved = localStorage.getItem('tableUuid');
+    return saved || '';
+  });
   const [customerNames, setCustomerNames] = useState<string[]>(() => {
     const saved = localStorage.getItem('customerNames');
     return saved ? JSON.parse(saved) : [];
@@ -46,8 +52,11 @@ export function GroupOrderProvider({ children }: { children: React.ReactNode }) 
     const saved = localStorage.getItem('currentOrder');
     return saved ? JSON.parse(saved) : null;
   });
-  const { currentOrder: sharedOrder } = usePage().props as any;
-  const [currentCustomerIndex, setCurrentCustomerIndex] = useState(0);
+  const { currentOrder: sharedOrder, table_uuid: sharedTableUuid } = usePage().props as any;
+  const [currentCustomerIndex, setCurrentCustomerIndex] = useState<number>(() => {
+    const saved = localStorage.getItem('currentCustomerIndex');
+    return saved ? parseInt(saved) : 0;
+  });
 
   // Sync with shared props from Inertia
   useEffect(() => {
@@ -73,9 +82,11 @@ export function GroupOrderProvider({ children }: { children: React.ReactNode }) 
 
   // Persistence effects
   useEffect(() => { localStorage.setItem('tableNumber', tableNumber.toString()); }, [tableNumber]);
+  useEffect(() => { localStorage.setItem('tableUuid', tableUuid); }, [tableUuid]);
   useEffect(() => { localStorage.setItem('customerNames', JSON.stringify(customerNames)); }, [customerNames]);
   useEffect(() => { localStorage.setItem('cart', JSON.stringify(cart)); }, [cart]);
   useEffect(() => { localStorage.setItem('currentOrder', JSON.stringify(currentOrder)); }, [currentOrder]);
+  useEffect(() => { localStorage.setItem('currentCustomerIndex', currentCustomerIndex.toString()); }, [currentCustomerIndex]);
 
   const addToCart = (item: Omit<CartItem, 'customerName'>) => {
     setCart(prev => [...prev, { ...item, customerName: customerNames[currentCustomerIndex] || 'Guest' }]);
@@ -98,6 +109,22 @@ export function GroupOrderProvider({ children }: { children: React.ReactNode }) 
     window.location.href = '/';
   };
 
+  const resetGroupOrder = () => {
+    const uuid = tableUuid || sharedTableUuid || localStorage.getItem('tableUuid');
+    setCart([]);
+    setCustomerNames([]);
+    setCurrentCustomerIndex(0);
+    localStorage.removeItem('cart');
+    localStorage.removeItem('customerNames');
+    localStorage.removeItem('currentCustomerIndex');
+    
+    if (uuid) {
+      router.visit(route('table.welcome', { table: uuid }));
+    } else {
+      window.location.href = '/';
+    }
+  };
+
   const currentCustomerName = customerNames[currentCustomerIndex] || '';
 
   return (
@@ -114,7 +141,9 @@ export function GroupOrderProvider({ children }: { children: React.ReactNode }) 
       setCurrentOrder,
       clearCart,
       logout,
-      tableNumber
+      resetGroupOrder,
+      tableNumber,
+      tableUuid
     }}>
       {children}
     </GroupOrderContext.Provider>
@@ -170,7 +199,7 @@ function CustomerLayoutContent({ children }: { children: React.ReactNode }) {
             setCurrentOrder(e.order);
             
             if (e.order.status === 'ready') {
-              const audio = new Audio('/is-ready.mp3');
+              const audio = new Audio('/sounds/is-ready.mp3');
               audio.volume = 0.5;
               audio.play().catch(() => {});
 
@@ -230,7 +259,6 @@ function CustomerLayoutContent({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen bg-background text-foreground pb-24">
-      <Toaster position="top-center" />
       
       {/* Floating Active Order Badge - Only show for active preparation states */}
       {currentOrder && 

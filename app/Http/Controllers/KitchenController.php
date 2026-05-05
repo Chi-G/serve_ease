@@ -12,7 +12,7 @@ class KitchenController extends Controller
     {
         return Inertia::render('KDS/Index', [
             'orders' => Order::with(['items.product', 'table', 'customer'])
-                ->whereNotIn('status', ['completed', 'cancelled'])
+                ->whereIn('status', ['in-kitchen', 'paid', 'ready', 'served'])
                 ->orderBy('created_at', 'asc')
                 ->get(),
         ]);

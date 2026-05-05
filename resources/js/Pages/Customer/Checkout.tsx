@@ -9,7 +9,7 @@ function CheckoutContent() {
   const { cart, customerNames, setCurrentOrder, clearCart, tableNumber } = useGroupOrder();
   const confirm = useConfirm();
 
-  const getOrderData = (method: 'card' | 'transfer', queueNum: string, email?: string) => {
+  const getOrderData = (method: 'online' | 'offline', queueNum: string, email?: string) => {
     const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     return {
       table_id: tableNumber,
@@ -44,9 +44,9 @@ function CheckoutContent() {
     };
   };
 
-  const finalizeOrder = (method: 'card' | 'transfer') => {
+  const finalizeOrder = (method: 'online' | 'offline', email?: string) => {
     const queueNum = `G-${String(Math.floor(Math.random() * 9000) + 1000)}`;
-    const orderData = getOrderData(method, queueNum);
+    const orderData = getOrderData(method, queueNum, email);
     const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
     if (orderData.items.length === 0) {
@@ -58,7 +58,7 @@ function CheckoutContent() {
 
     router.post(route('orders.store'), orderData, {
       onSuccess: () => {
-        toast.success('Order placed successfully!');
+        toast.success(method === 'offline' ? 'Order placed! A waiter is coming.' : 'Order placed successfully!');
         const order: Order = {
           id: Date.now(),
           table_id: tableNumber,
@@ -94,7 +94,7 @@ function CheckoutContent() {
             };
           }).filter((item): item is NonNullable<typeof item> => item !== null),
           total_price: total,
-          status: method === 'card' ? 'in-kitchen' : 'pending',
+          status: method === 'online' ? 'in-kitchen' : 'pending',
           queue_number: queueNum,
           tokenNumber: queueNum,
           created_at: new Date().toISOString(),
@@ -115,22 +115,24 @@ function CheckoutContent() {
     });
   };
 
-  const handlePayment = async (method: 'card' | 'transfer', email?: string) => {
-    if (method === 'transfer') {
+  const handlePayment = async (method: 'online' | 'offline', email?: string) => {
+    if (method === 'offline') {
       const ok = await confirm({
-        title: 'Confirm Transfer?',
-        message: 'Have you completed the bank transfer? A waiter will need to verify this manually before your order is processed.',
-        confirmLabel: 'Yes, I have Transferred',
-        cancelLabel: 'Not yet',
+        title: 'Confirm Cash/POS?',
+        message: 'A waiter will come to your table with the bill and POS machine. Continue?',
+        confirmLabel: 'Yes, Call Waiter',
+        cancelLabel: 'Go Back',
         type: 'warning'
       });
       if (!ok) return;
+      finalizeOrder('offline', email);
+      return;
     }
 
-    if (method === 'card') {
+    if (method === 'online') {
       const loadingToast = toast.loading('Initializing secure payment...');
       const queueNum = `G-${String(Math.floor(Math.random() * 9000) + 1000)}`;
-      const orderData = getOrderData('card', queueNum, email);
+      const orderData = getOrderData('online', queueNum, email);
       
       (window as any).axios.post(route('payment.initialize'), orderData)
         .then((response: any) => {
@@ -144,10 +146,9 @@ function CheckoutContent() {
         .catch((err: any) => {
           toast.dismiss(loadingToast);
           console.error('Payment initialization error:', err);
-          toast.error('Failed to initialize payment. Please try again or call a waiter.');
+          const errorMessage = err.response?.data?.message || 'Failed to initialize payment. Please try again or call a waiter.';
+          toast.error(errorMessage);
         });
-    } else {
-      finalizeOrder('transfer');
     }
   };
 

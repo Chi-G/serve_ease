@@ -9,6 +9,7 @@ function TrackingContent() {
     localStorage.removeItem('cart');
     localStorage.removeItem('customerNames');
     localStorage.removeItem('currentOrder');
+    localStorage.removeItem('currentCustomerIndex');
     router.visit(route('welcome'));
   };
 
@@ -41,16 +42,7 @@ function TrackingContent() {
         onCallWaiter={() => alert('Waiter called!')}
         onUpdateStatus={(status) => setCurrentOrder({ ...currentOrder, status })}
         onCancelOrder={() => {
-          router.post(route('orders.cancel', currentOrder.id), {}, {
-            onFinish: () => {
-                // Definitively clear local memory regardless of server response
-                setCurrentOrder(null);
-                localStorage.removeItem('currentOrder');
-                localStorage.removeItem('cart');
-                localStorage.removeItem('customerNames');
-                router.visit(route('menu.index'), { replace: true });
-            }
-          });
+          router.post(route('orders.cancel', currentOrder.id));
         }}
       />
     </>

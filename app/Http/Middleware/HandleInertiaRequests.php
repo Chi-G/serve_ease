@@ -39,9 +39,10 @@ class HandleInertiaRequests extends Middleware
                 'success' => $request->session()->get('success'),
                 'error' => $request->session()->get('error'),
             ],
+            'table_uuid' => $request->session()->get('table_uuid'),
             'currentOrder' => function () use ($request) {
                 $order = $request->session()->get('currentOrder');
-                if ($order && in_array($order->status, ['served', 'completed', 'cancelled'])) {
+                if ($order && in_array(data_get($order, 'status'), ['served', 'completed', 'cancelled'])) {
                     $request->session()->forget('currentOrder');
                     return null;
                 }

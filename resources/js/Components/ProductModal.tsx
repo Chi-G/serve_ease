@@ -46,8 +46,8 @@ export function ProductModal({ item, onClose, onAddToCart }: ProductModalProps) 
     const proteinNotes = selectedProteinsData.map(p => `+ ${p?.name}`).join(', ');
     const proteinsTotalPrice = selectedProteinsData.reduce((sum, p) => sum + (p?.price || 0), 0);
     
-    // Combine base price and protein price for the cart item
-    const finalPrice = item.price + (proteinsTotalPrice / quantity);
+    // Combine base price and protein price for the cart item, rounding to 2 decimal places
+    const finalPrice = Math.round((Number(item.price) + (proteinsTotalPrice / quantity)) * 100) / 100;
 
     onAddToCart({
       id: `${item.id}-${Date.now()}`,
@@ -67,7 +67,7 @@ export function ProductModal({ item, onClose, onAddToCart }: ProductModalProps) 
   const showProteinUpsell = !EXCLUDED_CATEGORIES.includes(item.category);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
+    <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center">
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
 
       <div className="relative w-full max-w-lg bg-card rounded-t-3xl sm:rounded-3xl max-h-[90vh] overflow-y-auto scrollbar-hide">

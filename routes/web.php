@@ -18,8 +18,10 @@ Route::get('/', function () {
 })->name('welcome');
 
 Route::get('/table/{table:uuid}', function (Table $table) {
+    session(['table_uuid' => $table->uuid]);
     return Inertia::render('Welcome', [
         'tableNumber' => (int)$table->table_num,
+        'tableUuid' => $table->uuid,
     ]);
 })->name('table.welcome');
 
@@ -63,6 +65,7 @@ Route::patch('/kitchen/orders/{order}', [App\Http\Controllers\KitchenController:
 // Waiter / Service Captain Routes
 Route::get('/waiter', [App\Http\Controllers\ServiceRequestController::class, 'index'])->middleware(['auth'])->name('waiter.dashboard');
 Route::post('/waiter/requests/{serviceRequest}/resolve', [App\Http\Controllers\ServiceRequestController::class, 'update'])->middleware(['auth'])->name('waiter.requests.resolve');
+Route::post('/waiter/orders/{order}/paid', [App\Http\Controllers\OrderController::class, 'markAsPaid'])->middleware(['auth'])->name('waiter.orders.paid');
 Route::post('/waiter/orders/{order}/serve', [App\Http\Controllers\KitchenController::class, 'updateStatus'])->middleware(['auth'])->name('waiter.orders.serve');
 
 Route::get('/inventory', [App\Http\Controllers\ProductController::class, 'index'])->middleware(['auth'])->name('manager.inventory');

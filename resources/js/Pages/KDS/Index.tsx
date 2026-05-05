@@ -10,7 +10,7 @@ interface KDSIndexProps {
 export default function KDSIndex({ orders }: KDSIndexProps) {
   const handleUpdateOrder = (orderId: number, updates: Partial<Order>) => {
     // Play a subtle success sound (Professional standard for KDS feedback)
-    const audio = new Audio('/is-ready.mp3');
+    const audio = new Audio('/sounds/is-ready.mp3');
     audio.volume = 0.4;
     audio.play().catch(() => {});
 
